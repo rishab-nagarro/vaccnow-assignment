@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      id: "create tables"
+      author: "rishabbhatnagar"
+      context: create
+      relativeToChangelogFile: true
+      file: DDL/query.changelog.query.sql
+  - include:
+      id: "populate branch data"
+      author: "rishabbhatnagar"
+      context: create
+      relativeToChangelogFile: true
+      file: DML/_01_changelog.query.sql
