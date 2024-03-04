@@ -36,6 +36,7 @@ public class VaccNowServiceImpl implements VaccNowService {
     private final BranchRepository branchRepository;
     private final ScheduleVaccinationRepository scheduleVaccinationRepository;
     private static final Logger logger = LoggerFactory.getLogger(VaccNowServiceImpl.class);
+
     @Override
     public List<BranchResponse> getAllBranches() throws Exception {
         try {
@@ -122,44 +123,38 @@ public class VaccNowServiceImpl implements VaccNowService {
     public ScheduleVaccineResponse scheduleVaccine(Long branchId, ScheduleVaccineRequest scheduleVaccineRequest) throws Exception {
         try {
             logger.info("*** Inside scheduleVaccine  ***");
-            LocalDateTime currentDateTime = LocalDateTime.now();
-            LocalDateTime futureDatetime = currentDateTime.plusMinutes(15);
             List<AvailabilityEntity> availabilityEntityList = availabilityRepository.findByBranchId(branchId);
             if (ObjectUtils.isNotEmpty(availabilityEntityList)) {
-                if (scheduleVaccineRequest.getScheduledDateTime().isAfter(futureDatetime)) {
-                    LocalDate date = scheduleVaccineRequest.getScheduledDateTime().toLocalDate();
-                    LocalTime time = scheduleVaccineRequest.getScheduledDateTime().toLocalTime();
-                    if (availabilityEntityList.stream().filter(e -> date.equals(e.getAvailableDate())
-                            && time.equals(e.getAvailableTimeSlot())
-                            && scheduleVaccineRequest.getVaccineId().equals(e.getVaccineId())).findFirst().isPresent()) {
-                        ScheduleVaccinationEntity entity = new ScheduleVaccinationEntity();
-                        entity.setVaccineId(scheduleVaccineRequest.getVaccineId());
-                        entity.setBranchId(branchId);
-                        entity.setCustomerName(scheduleVaccineRequest.getCustomerName());
-                        entity.setCustomerEmail(scheduleVaccineRequest.getCustomerEmail());
-                        entity.setPaymentMethod(scheduleVaccineRequest.getPaymentMethod());
-                        entity.setScheduledDateTime(scheduleVaccineRequest.getScheduledDateTime());
-                        entity.setConfirmationStatus(AppConstant.CONFIRMED);
-                        entity = scheduleVaccinationRepository.save(entity);
+                LocalDate date = scheduleVaccineRequest.getScheduledDateTime().toLocalDate();
+                LocalTime time = scheduleVaccineRequest.getScheduledDateTime().toLocalTime();
+                if (availabilityEntityList.stream().filter(e -> date.equals(e.getAvailableDate())
+                        && time.equals(e.getAvailableTimeSlot())
+                        && scheduleVaccineRequest.getVaccineId().equals(e.getVaccineId())).findFirst().isPresent()) {
+                    ScheduleVaccinationEntity entity = new ScheduleVaccinationEntity();
+                    entity.setVaccineId(scheduleVaccineRequest.getVaccineId());
+                    entity.setBranchId(branchId);
+                    entity.setCustomerName(scheduleVaccineRequest.getCustomerName());
+                    entity.setCustomerEmail(scheduleVaccineRequest.getCustomerEmail());
+                    entity.setPaymentMethod(scheduleVaccineRequest.getPaymentMethod());
+                    entity.setScheduledDateTime(scheduleVaccineRequest.getScheduledDateTime());
+                    entity.setConfirmationStatus(AppConstant.CONFIRMED);
+                    entity = scheduleVaccinationRepository.save(entity);
 
-                        EmailDetailModel emailDetailModel = new EmailDetailModel();
-                        emailDetailModel.setPersonEmailId(scheduleVaccineRequest.getCustomerEmail());
-                        String subject = AppConstant.VACCINATION_SUBJECT;
-                        String message = "Hi" + scheduleVaccineRequest.getCustomerName() + "\n\n" + AppConstant.SUCCESS_MESSAGE;
-                        emailDetailModel.setSubject(subject);
-                        emailDetailModel.setMessage(message);
-                        logger.info("*** Before Mail sent. ***");
-                        emailService.SendCustomEmail(emailDetailModel);
-                        logger.info("*** After Mail sent. ***");
-                        ScheduleVaccineResponse scheduleVaccineResponse = new ScheduleVaccineResponse();
-                        scheduleVaccineResponse.setScheduleId(entity.getId());
-                        scheduleVaccineResponse.setMessage(AppConstant.SUCCESS_MESSAGE);
-                        return scheduleVaccineResponse;
-                    } else {
-                        throw new IllegalArgumentException(AppConstant.NO_SLOT_ERROR_MESSAGE);
-                    }
+                    EmailDetailModel emailDetailModel = new EmailDetailModel();
+                    emailDetailModel.setPersonEmailId(scheduleVaccineRequest.getCustomerEmail());
+                    String subject = AppConstant.VACCINATION_SUBJECT;
+                    String message = "Hi" + scheduleVaccineRequest.getCustomerName() + "\n\n" + AppConstant.SUCCESS_MESSAGE;
+                    emailDetailModel.setSubject(subject);
+                    emailDetailModel.setMessage(message);
+                    logger.info("*** Before Mail sent. ***");
+                    emailService.SendCustomEmail(emailDetailModel);
+                    logger.info("*** After Mail sent. ***");
+                    ScheduleVaccineResponse scheduleVaccineResponse = new ScheduleVaccineResponse();
+                    scheduleVaccineResponse.setScheduleId(entity.getId());
+                    scheduleVaccineResponse.setMessage(AppConstant.SUCCESS_MESSAGE);
+                    return scheduleVaccineResponse;
                 } else {
-                    throw new IllegalArgumentException(AppConstant.TIME_GAP_ERROR_MESSAGE);
+                    throw new IllegalArgumentException(AppConstant.NO_SLOT_ERROR_MESSAGE);
                 }
             } else {
                 throw new DataRetrievalFailureException(AppConstant.NO_DATA_AVAILABLE);
@@ -197,7 +192,7 @@ public class VaccNowServiceImpl implements VaccNowService {
             logger.info("*** Inside getAllAppliedVaccinationPerDay  ***");
             LocalDateTime startDateTime = date.atStartOfDay();
             LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
-            List<ScheduleVaccinationEntity> scheduleVaccinationList = scheduleVaccinationRepository.findDataByRange(startDateTime, endDateTime);;
+            List<ScheduleVaccinationEntity> scheduleVaccinationList = scheduleVaccinationRepository.findDataByRange(startDateTime, endDateTime);
             List<VaccinationResponse> vaccinationResponseList = new ArrayList<>();
             if (ObjectUtils.isNotEmpty(scheduleVaccinationList)) {
                 for (ScheduleVaccinationEntity s : scheduleVaccinationList) {
