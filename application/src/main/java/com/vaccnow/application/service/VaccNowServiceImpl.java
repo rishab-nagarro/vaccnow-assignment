@@ -13,6 +13,7 @@ import com.vaccnow.application.requestmodel.ScheduleVaccineRequest;
 import com.vaccnow.application.responsemodel.*;
 import com.vaccnow.application.util.AppConstant;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -40,7 +41,7 @@ public class VaccNowServiceImpl implements VaccNowService {
         try {
             logger.info("Inside getAllBranches");
             List<BranchEntity> branchList = branchRepository.findAll();
-            if (!branchList.isEmpty()) {
+            if (ObjectUtils.isNotEmpty(branchList)) {
                 return vaccNowMapper.branchEntityToResponse(branchList);
             } else {
                 logger.error(AppConstant.NO_DATA_AVAILABLE);
@@ -58,7 +59,7 @@ public class VaccNowServiceImpl implements VaccNowService {
             logger.info("*** Inside getAvailableVaccines ***");
             List<AvailabilityEntity> availabilityEntityList = availabilityRepository.findByBranchId(branchId);
             List<AvailableVaccineResponse> availableVaccineResponseList = new ArrayList<>();
-            if (!availabilityEntityList.isEmpty()) {
+            if (ObjectUtils.isNotEmpty(availabilityEntityList)) {
                 for (AvailabilityEntity a : availabilityEntityList) {
                     availableVaccineResponseList.add(vaccNowMapper.availabilityEntityToAvailableVaccineResponse(a));
                 }
@@ -79,7 +80,7 @@ public class VaccNowServiceImpl implements VaccNowService {
             logger.info("*** Inside getSpecificAvailabilityByBranch ***");
             List<AvailabilityEntity> availabilityEntityList = availabilityRepository.findByBranchId(branchId);
             List<AvailabilityResponse> availabilityResponseList = new ArrayList<>();
-            if (!availabilityEntityList.isEmpty()) {
+            if (ObjectUtils.isNotEmpty(availabilityEntityList)) {
                 for (AvailabilityEntity a : availabilityEntityList) {
                     availabilityResponseList.add(vaccNowMapper.availabilityEntityToAvailabilityResponse(a));
                 }
@@ -100,7 +101,7 @@ public class VaccNowServiceImpl implements VaccNowService {
             logger.info("*** Inside getAvailableTimeSlots  ***");
             List<AvailabilityEntity> availability = availabilityRepository.findByBranchIdAndAvailableDate(branchId, date);
             TimeSlots timeSlots = new TimeSlots();
-            if (availability != null) {
+            if (ObjectUtils.isNotEmpty(availability)) {
                 List<LocalTime> localTimeList = new ArrayList<>();
                 for (AvailabilityEntity a : availability) {
                     localTimeList.add(a.getAvailableTimeSlot());
@@ -124,7 +125,7 @@ public class VaccNowServiceImpl implements VaccNowService {
             LocalDateTime currentDateTime = LocalDateTime.now();
             LocalDateTime futureDatetime = currentDateTime.plusMinutes(15);
             List<AvailabilityEntity> availabilityEntityList = availabilityRepository.findByBranchId(branchId);
-            if (!availabilityEntityList.isEmpty()) {
+            if (ObjectUtils.isNotEmpty(availabilityEntityList)) {
                 if (scheduleVaccineRequest.getScheduledDateTime().isAfter(futureDatetime)) {
                     LocalDate date = scheduleVaccineRequest.getScheduledDateTime().toLocalDate();
                     LocalTime time = scheduleVaccineRequest.getScheduledDateTime().toLocalTime();
@@ -175,7 +176,7 @@ public class VaccNowServiceImpl implements VaccNowService {
             logger.info("*** Inside getAllAppliedVaccinationPerBranch  ***");
             List<ScheduleVaccinationEntity> scheduleVaccinationList = scheduleVaccinationRepository.findByBranchId(branchId);
             List<VaccinationResponse> vaccinationResponseList = new ArrayList<>();
-            if (!scheduleVaccinationList.isEmpty()) {
+            if (ObjectUtils.isNotEmpty(scheduleVaccinationList)) {
                 for (ScheduleVaccinationEntity s : scheduleVaccinationList) {
                     vaccinationResponseList.add(vaccNowMapper.scheduleVaccinationEntityToVaccinationResponse(s));
                 }
@@ -198,7 +199,7 @@ public class VaccNowServiceImpl implements VaccNowService {
             LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
             List<ScheduleVaccinationEntity> scheduleVaccinationList = scheduleVaccinationRepository.findDataByRange(startDateTime, endDateTime);;
             List<VaccinationResponse> vaccinationResponseList = new ArrayList<>();
-            if (!scheduleVaccinationList.isEmpty()) {
+            if (ObjectUtils.isNotEmpty(scheduleVaccinationList)) {
                 for (ScheduleVaccinationEntity s : scheduleVaccinationList) {
                     vaccinationResponseList.add(vaccNowMapper.scheduleVaccinationEntityToVaccinationResponse(s));
                 }
@@ -219,7 +220,7 @@ public class VaccNowServiceImpl implements VaccNowService {
             logger.info("*** Inside getAllConfirmedVaccination  ***");
             List<ScheduleVaccinationEntity> scheduleVaccinationList = scheduleVaccinationRepository.findDataByRange(startDate, endDate);
             List<VaccinationResponse> vaccinationResponseList = new ArrayList<>();
-            if (!scheduleVaccinationList.isEmpty()) {
+            if (ObjectUtils.isNotEmpty(scheduleVaccinationList)) {
                 for (ScheduleVaccinationEntity s : scheduleVaccinationList) {
                     vaccinationResponseList.add(vaccNowMapper.scheduleVaccinationEntityToVaccinationResponse(s));
                 }
