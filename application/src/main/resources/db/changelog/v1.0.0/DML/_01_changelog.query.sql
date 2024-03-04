@@ -1,12 +1,12 @@
 -- liquibase formatted sql
 
 -- changeset rishabbhatnagar:populate-branch-static-data
-INSERT INTO branch (id, branch_name, address, contact_info) VALUES (1, 'BranchA', 'abc','124527244');
-INSERT INTO branch (id, branch_name, address, contact_info) VALUES (2, 'BranchB', 'bbc','124527244');
+INSERT INTO branch (id, branch_name, address, contact_info) VALUES (1, 'BranchA', 'BranchA Address','branch.a@gmail.com');
+INSERT INTO branch (id, branch_name, address, contact_info) VALUES (2, 'BranchB', 'BranchB Address','branch.b@gmail.com');
 
 -- changeset rishabbhatnagar:populate-vaccine-static-data
 INSERT INTO vaccine (id, vaccine_name, manufacturer, type,description) VALUES (1, 'VaccineA', 'VaccineA Manufacturer','Fever','Vaccine for fever');
-INSERT INTO vaccine (id, vaccine_name, manufacturer, type,description) VALUES (2, 'VaccineB', 'VaccineB Manufacturer','FevColder','Vaccine for Cold');
+INSERT INTO vaccine (id, vaccine_name, manufacturer, type,description) VALUES (2, 'VaccineB', 'VaccineB Manufacturer','Cold','Vaccine for Cold');
 
 -- changeset rishabbhatnagar:populate-availability-static-data
 INSERT INTO availability (id, branch_id, vaccine_id, available_date,available_time_slot) VALUES (1, 1, 1,'2024-03-04','09:00');
